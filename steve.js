@@ -15,7 +15,7 @@ const githubData = [
         "name": "nashville-software-school/client-side-mastery",
         "url": "https://api.github.com/repos/nashville-software-school/client-side-mastery"
       },
-      "payload": {
+      "payload":  {
         "push_id": 2755309252,
         "size": 1,
         "distinct_size": 1,
@@ -4407,11 +4407,236 @@ const githubData = [
     }
   ]
 
+/* --------------------------------------------------------------------------------------------*/
+// ONE. How many total commits were made in all of Steve's events?
+    // githubData > payload > commits > (objects in commits)
 
-// How many total commits were made in all of Steve's events?
-// How many of each event type are there? (PullRequestEvent, PushEvent, etc)
-// List all Github users who submitted a pull request that was approved by Steve.
-// List all repositories on which Steve had an event, and show how many events were on each one.
-// Which event had the most number of commits?
-// Which programming langugages were affected by Steve's events?
-// What programming language was the most affected by Steve's events?
+let totalCommits = 0;
+
+for (let i = 0; i < githubData.length; i++) {                 // Creates list of all objects inside githubData
+  if (githubData[i].payload.hasOwnProperty("commits")) {      // Looks through "payload" values for the "commits" key
+    totalCommits += githubData[i].payload.commits.length;     // Goes to "commits" array & looks for number of items (objects) inside
+  }
+}
+
+console.log("Number of total commits:", totalCommits);
+
+/****** Emily's Method ******/
+let commitsTotal = 0;
+
+githubData.forEach(steveEvent => {
+  if (steveEvent.type === "PushEvent") {
+    commitsTotal += steveEvent.payload.commits.length;
+    console.log("Total commits:", totalCommits);
+  }
+});
+
+
+/* --------------------------------------------------------------------------------------------*/
+// TWO. How many of each event type are there? (PullRequestEvent, PushEvent, etc)
+    // PullRequestEvent, PushEvent, DeleteEvent, CreateEvent, IssueCommentEvent
+
+let PullRequestEvent = 0;
+let PushEvent = 0;
+let DeleteEvent = 0;
+let CreateEvent = 0;
+let IssueCommentEvent = 0;
+
+for (let i = 0; i < githubData.length; i++) {
+  if (githubData[i].type === "PullRequestEvent") {
+    PullRequestEvent += 1;
+  }
+  else if (githubData[i].type === "PushEvent") {
+    PushEvent += 1;
+  }
+  else if (githubData[i].type === "DeleteEvent") {
+    DeleteEvent += 1;
+  }
+  else if (githubData[i].type === "CreateEvent") {
+    CreateEvent += 1;
+  }
+  else if (githubData[i].type === "IssueCommentEvent") {
+    IssueCommentEvent += 1;
+  }
+}
+
+console.log("Number of PullRequestEvents:", PullRequestEvent);
+console.log("Number of PushEvents:", PushEvent);
+console.log("Number of DeleteEvents:", DeleteEvent);
+console.log("Number of CreateEvents:", CreateEvent);
+console.log("Number of IssueCommentEvents:", IssueCommentEvent);
+
+/******* Emily's Method  *******/
+
+console.table(githubData);            // Gives you a list of all the different event types
+
+let eventTypes = {                    // Make sure key name EXACTLY matches name in "githubData" so square brackets will work
+  PushEvent: 0, 
+  PullRequestEvent: 0,
+  IssueCommentEvent: 0,
+  DeleteEvent: 0,
+  CreateEvent: 0
+}
+
+githubData.forEach(stevent => {
+  eventTypes[stevent.type] += 1;        // Square brackets evaluate | Dot notation will add new keys to existing object
+});
+
+console.log("Emily's method listing event type totals", eventTypes);
+
+
+
+/* --------------------------------------------------------------------------------------------*/
+// THREE. List all Github users who submitted a pull request that was approved by Steve.
+    // PullRequestEvent > payload > pull_request > user > login
+
+
+let pullUsers = [];     // Create array because you're creating a list
+
+for (let i = 0; i < githubData.length; i++) {
+  if (githubData[i].type === "PullRequestEvent") {                      // if type = "PullRequestEvent" then...
+     const pullUser = githubData[i].payload.pull_request.user.login;    // grab "login" and assign to pullUser
+     if (pullUsers.indexOf(pullUser) === -1 ) {                         // optional: prevents duplicate users
+      pullUsers.push(pullUser);                                         // adds each user to array
+    }
+  }
+}
+
+console.log("List of users:", pullUsers);
+
+/******* Emily's Method  *******/
+
+let approvedUsers = [];
+
+githubData.forEach(stevent => {
+  if (stevent.type === "PullRequestEvent") {
+    if (!approvedUsers.includes(stevent.payload.pull_request.user.login)) {
+      approvedUsers.push(stevent.payload.pull_request.user.login);
+    };
+  };
+});
+
+console.log("List of users using Emily's method:", approvedUsers);
+
+
+/* --------------------------------------------------------------------------------------------*/
+// FOUR. List all repositories on which Steve had an event, and show how many events were on each one.  
+
+// loop through githubData.length
+// make list of all repos
+// if name = "nashville-software-school/client-side-mastery"
+// show how many times "type" occurs
+
+for (let i = 0; i < githubData.length; i++) {
+  const listOfRepos = githubData[i].repo.name;  
+  console.log(listOfRepos);     
+}
+
+let listOfRepos = {
+  "nashville-software-school/client-side-mastery": 0,
+  "nashville-software-school/bangazon-llc": 0,
+  "stevebrownlee/vps-setup": 0
+}
+
+// listOfRepos.nameOfRepo = numberOfEvents;
+
+/******* Emily's Method *******/
+
+let reposEvents = {
+  "nashville-software-school/client-side-mastery": 0,
+  "nashville-software-school/bangazon-llc": 0,
+  "stevebrownlee/vps-setup": 0,
+  "nss-day-cohort-27/brenda-snack-cake-store": 0
+}
+
+githubData.forEach(eventObj => {
+  reposEvents[eventObj.repo.name] ++;
+});
+
+console.log("Emily's method finding repos and their events", reposEvents);
+
+
+/* --------------------------------------------------------------------------------------------*/ 
+// FIVE. Which event had the most number of commits?
+
+// loop through githubData.length
+// narrow by event and select "commits" object
+// find number of commits per event
+
+let commitPullRequest = 0;
+let commitPushEvent = 0;
+let commitDeleteEvent = 0;
+let commitCreateEvent = 0;
+let commitIssueComment = 0;
+
+for (let i = 0; i < githubData.length; i++) {
+  if (githubData[i].type === "PullRequestEvent" && githubData[i].payload.hasOwnProperty("commits")) {
+    commitPullRequest += githubData[i].payload.commits.length;
+  }
+  else if (githubData[i].type === "PushEvent" && githubData[i].payload.hasOwnProperty("commits")) {    
+    commitPushEvent += githubData[i].payload.commits.length;
+  }
+  else if (githubData[i].type === "DeleteEvent" && githubData[i].payload.hasOwnProperty("commits")) {    
+    commitDeleteEvent += githubData[i].payload.commits.length;
+  }
+  else if (githubData[i].type === "CreateEvent" && githubData[i].payload.hasOwnProperty("commits")) {    
+    commitCreateEvent += githubData[i].payload.commits.length;
+  }
+  else if (githubData[i].type === "IssueCommentEvent" && githubData[i].payload.hasOwnProperty("commits")) {    
+    commitIssueComment += githubData[i].payload.commits.length;
+  }
+}
+
+console.log("Number of commits in PullRequestEvents:", commitPullRequest);
+console.log("Number of commits in PushEvents:", commitPushEvent);
+console.log("Number of commits in DeleteEvents:", commitDeleteEvent);
+console.log("Number of commits in CreateEvents:", commitCreateEvent);
+console.log("Number of commits in IssueCommentEvents:", commitIssueComment);
+
+// .max
+
+/******* Emily's Method  *******/
+
+let eventsCommits = {}
+
+githubData.forEach(githubEvent => {
+  if (githubEvent.type === "PushEvent") {
+    console.log("Event ID:", githubEvent.id, "Commits length:", githubEvent.payload.commits.length);
+    eventsCommits[githubEvent.id] = githubEvent.payload.commits.length;
+  };
+});
+
+console.log("Emily's method for finding events and their commits:", eventsCommits);
+
+
+/* --------------------------------------------------------------------------------------------*/
+// SIX. Which programming languages were affected by Steve's events?
+    // githubData > payload > pull_request > head > repo > language
+
+let pullLangs = [];                                         // Create array because you're creating a list
+
+for (let i = 0; i < githubData.length; i++) {
+  if (githubData[i].payload.hasOwnProperty("pull_request")) {   
+    const pullLang = githubData[i].payload.pull_request.head.repo.language;  
+    if (pullLangs.indexOf(pullLang) === -1 ) {                         // optional: prevents duplicate users
+      pullLangs.push(pullLang);                                         // adds each language to array
+    }
+  }
+}
+
+console.log(pullLangs); 
+console.log(`Languages affected: ${pullLangs}`);
+
+/******* Emily's Method  *******/
+
+githubData.forEach(stevent => {
+  if (stevent.type === "PullRequestEvent") {
+    console.log("Emily's method for finding languages:", stevent.payload.pull_request.head.repo.language);
+  };
+});
+
+
+/* --------------------------------------------------------------------------------------------*/
+// SEVEN. What programming language was the most affected by Steve's events?
+
+
