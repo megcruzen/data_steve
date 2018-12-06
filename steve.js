@@ -4627,6 +4627,7 @@ for (let i = 0; i < githubData.length; i++) {
 console.log(pullLangs); 
 console.log(`Languages affected: ${pullLangs}`);
 
+
 /******* Emily's Method  *******/
 
 githubData.forEach(stevent => {
